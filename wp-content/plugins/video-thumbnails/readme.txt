@@ -3,14 +3,16 @@ Contributors: sutherlandboswell
 Donate link: http://wie.ly/u/donate
 Tags: Video, Thumbnails, YouTube, Vimeo, Vine, Twitch, Dailymotion, Youku, Rutube, Featured Image
 Requires at least: 3.2
-Tested up to: 3.9.2
-Stable tag: 2.10.2
+Tested up to: 4.5
+Stable tag: 2.12.3
 
 Video Thumbnails simplifies the process of automatically displaying video thumbnails in your WordPress template.
 
 == Description ==
 
 Video Thumbnails makes it easy to automatically display video thumbnails in your template. When you publish a post, this plugin will find the first video embedded and retrieve a thumbnail for you. Thumbnails can be saved to your media library and set as a featured image automatically. There's even support for custom post types and custom fields!
+
+**Version 3.0** is on the way soon!
 
 = Video Thumbnails Pro =
 
@@ -32,6 +34,8 @@ Video Thumbnails makes it easy to automatically display video thumbnails in your
 * Funny or Die
 * CollegeHumor
 * MPORA
+* Livestream
+* Yahoo Screen
 * Wistia
 * Youku
 * Tudou
@@ -130,6 +134,28 @@ The Vimeo API has a rate limit, so in rare cases you may exceed this limit. Try 
 1. Settings page
 
 == Changelog ==
+
+= 2.12.3 =
+* Fixed HTML bug
+
+= 2.12.2 =
+* Added support for new Facebook embed code
+* Documentation prep for release of version 3.0
+
+= 2.12.1 =
+* Support for TED when using foreign languages
+
+= 2.12 =
+* Added support for Yahoo Screen
+
+= 2.11 =
+* Added support for Livestream
+* Support for latest TED embed code
+
+= 2.10.3 =
+* Various updates to providers
+* Removed "sslverify" => false in wp_remote_get() (may cause errors on WordPress versions before 3.7)
+* Better error messages for Google Drive
 
 = 2.10.2 =
 * Added actions hooks before and after generating attachment metadata
@@ -469,4 +495,4 @@ This version adds the thumbnail URL to the post's meta data, meaning any outside
 
 == Roadmap ==
 
-With the release of 2.0, focus will be put on ensuring more widespread support and providing tools for other developers.
+Version 3.0 is being finished up for release soon.

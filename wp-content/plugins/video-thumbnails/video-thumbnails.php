@@ -5,12 +5,12 @@ Plugin URI: https://refactored.co/plugins/video-thumbnails
 Description: Automatically retrieve video thumbnails for your posts and display them in your theme. Supports YouTube, Vimeo, Facebook, Vine, Justin.tv, Twitch, Dailymotion, Metacafe, VK, Blip, Google Drive, Funny or Die, CollegeHumor, MPORA, Wistia, Youku, and Rutube.
 Author: Sutherland Boswell
 Author URI: http://sutherlandboswell.com
-Version: 2.10.2
+Version: 2.12.3
 License: GPL2
 Text Domain: video-thumbnails
 Domain Path: /languages/
 */
-/*  Copyright 2014 Sutherland Boswell  (email : sutherland.boswell@gmail.com)
+/*  Copyright 2015 Sutherland Boswell  (email : sutherland.boswell@gmail.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License, version 2, as 
@@ -30,7 +30,7 @@ Domain Path: /languages/
 
 define( 'VIDEO_THUMBNAILS_PATH', dirname(__FILE__) );
 define( 'VIDEO_THUMBNAILS_FIELD', '_video_thumbnail' );
-define( 'VIDEO_THUMBNAILS_VERSION', '2.10.2' );
+define( 'VIDEO_THUMBNAILS_VERSION', '2.12.3' );
 
 // Providers
 require_once( VIDEO_THUMBNAILS_PATH . '/php/providers/providers.php' );
@@ -103,6 +103,10 @@ class Video_Thumbnails {
 		add_management_page( __( 'Bulk Video Thumbnails', 'video-thumbnails' ), __( 'Bulk Video Thumbs', 'video-thumbnails' ), 'manage_options', 'video-thumbnails-bulk', array( &$this, 'bulk_scanning_page' ) );
 	}
 
+	/**
+	 * Enqueues necessary admin scripts
+	 * @param  string $hook A hook for the current admin page
+	 */
 	function admin_scripts( $hook ) {
 		// Bulk tool page
 		if ( 'tools_page_video-thumbnails-bulk' == $hook ) {
@@ -127,7 +131,9 @@ class Video_Thumbnails {
 		}
 	}
 
-	// Initialize meta box on edit page
+	/**
+	 * Initialize meta box on edit page
+	 */
 	function meta_box_init() {
 		if ( is_array( $this->settings->options['post_types'] ) ) {
 			foreach ( $this->settings->options['post_types'] as $type ) {
@@ -136,7 +142,9 @@ class Video_Thumbnails {
 		}
 	}
 
-	// Construct the meta box
+	/**
+	 * Renders the video thumbnail meta box
+	 */
 	function meta_box() {
 		global $post;
 		// Add hidden troubleshooting info
@@ -158,7 +166,7 @@ class Video_Thumbnails {
 				echo '<p><a href="#" id="video-thumbnails-reset" onclick="video_thumbnails_reset(\'' . $post->ID . '\' );return false;">' . __( 'Reset Video Thumbnail', 'video-thumbnails' ) . '</a></p>';
 			} else {
 				echo '<p id="video-thumbnails-preview">' . __( 'No video thumbnail for this post.', 'video-thumbnails' ) . '</p>';
-				echo '<p><a href="#" id="video-thumbnails-reset" onclick="video_thumbnails_reset(\'' . $post->ID . '\' );return false;">' . __( 'Search Again', 'video-thumbnails' ) . '</a> <a href="#TB_inline?width=400&height=600&inlineId=video-thumbnail-not-found-troubleshooting" class="thickbox" style="float:right;">' . __( 'Troubleshoot', 'video-thumbnails' ) . '<a/></p>';
+				echo '<p><a href="#" id="video-thumbnails-reset" onclick="video_thumbnails_reset(\'' . $post->ID . '\' );return false;">' . __( 'Search Again', 'video-thumbnails' ) . '</a> <a href="#TB_inline?width=400&height=600&inlineId=video-thumbnail-not-found-troubleshooting" class="thickbox" style="float:right;">' . __( 'Troubleshoot', 'video-thumbnails' ) . '</a></p>';
 			}
 		} else {
 			if ( isset( $video_thumbnail ) && $video_thumbnail != '' ) {
@@ -243,7 +251,11 @@ class Video_Thumbnails {
 		return $thumbnail;
 	}
 
-	// The main event
+	/**
+	 * Finds the video thumbnail for a post, saves/sets as featured image if enabled, saves image URL to custom field and then returns the URL
+	 * @param  int   $post_id An optional post ID (can be left blank in a loop)
+	 * @return mixed          A string with an image URL if successful or null if there is no video thumbnail
+	 */
 	function get_video_thumbnail( $post_id = null ) {
 
 		// Get the post ID if none is provided
@@ -340,11 +352,16 @@ class Video_Thumbnails {
 		return $filename;
 	}
 
-	// Saves to media library
+	/**
+	 * Saves a remote image to the media library
+	 * @param  string $image_url URL of the image to save
+	 * @param  int    $post_id   ID of the post to attach image to
+	 * @return int               ID of the attachment
+	 */
 	public static function save_to_media_library( $image_url, $post_id ) {
 
 		$error = '';
-		$response = wp_remote_get( $image_url, array( 'sslverify' => false ) );
+		$response = wp_remote_get( $image_url );
 		if( is_wp_error( $response ) ) {
 			$error = new WP_Error( 'thumbnail_retrieval', sprintf( __( 'Error retrieving a thumbnail from the URL <a href="%1$s">%1$s</a> using <code>wp_remote_get()</code><br />If opening that URL in your web browser returns anything else than an error page, the problem may be related to your web server and might be something your host administrator can solve.', 'video-thumbnails' ), $image_url ) . '<br>' . __( 'Error Details:', 'video-thumbnails' ) . ' ' . $response->get_error_message() );
 		} else {
@@ -418,9 +435,11 @@ class Video_Thumbnails {
 
 		return $attach_id;
 
-	} // End of save to media library function
+	}
 
-	// Post editor Ajax reset script
+	/**
+	 * Ajax reset script for post editor
+	 */
 	function ajax_reset_script() {
 		echo '<!-- Video Thumbnails Ajax Search -->' . PHP_EOL;
 		echo '<script type="text/javascript">' . PHP_EOL;
@@ -437,7 +456,9 @@ class Video_Thumbnails {
 		echo '</script>' . PHP_EOL;
 	}
 
-	// Ajax reset callback
+	/**
+	 * Ajax callback for resetting a video thumbnail in the post editor
+	 */
 	function ajax_reset_callback() {
 		global $wpdb; // this is how you get access to the database
 
@@ -458,6 +479,9 @@ class Video_Thumbnails {
 		die();
 	}
 
+	/**
+	 * Ajax callback used to get all the post IDs to be scanned in bulk
+	 */
 	function bulk_posts_query_callback() {
 		// Some default args
 		$args = array(
@@ -476,6 +500,9 @@ class Video_Thumbnails {
 		die();
 	}
 
+	/**
+	 * Ajax callback used to get the video thumbnail for an individual post in the process of running the bulk tool
+	 */
 	function get_thumbnail_for_post_callback() {
 
 		$post_id = $_POST['post_id'];
@@ -504,6 +531,9 @@ class Video_Thumbnails {
 		die();
 	}
 
+	/**
+	 * A function that renders the bulk scanning page
+	 */
 	function bulk_scanning_page() {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
